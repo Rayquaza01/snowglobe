@@ -2,9 +2,14 @@
 -- name of cart v1.0
 -- by Arnaught
 
+include("pph.lua")
+
 function _init()
+	info("snowglobe start")
+
 	window({
-		width = 64, height = 64
+		width = 128, height = 128,
+		title = "Snowglobe"
 	})
 
 	--- @type userdata[]
@@ -12,15 +17,26 @@ function _init()
 end
 
 function _update()
-	if rnd() <= 0.2 then
-		add(snowflakes, vec(flr(rnd(64)), 0))
+	if rnd() <= 0.15 then
+		-- x, y, speed, sway speed
+		add(snowflakes, vec(
+			flr(rnd(128)), -- x
+			0,             -- y
+			rnd(1.5) + .5, -- speed
+			rnd()          -- sway speed
+		))
 	end
 
 	for s in all(snowflakes) do
-		local x, y = s:get(0, 2)
+		local x, y, speed, sway = s:get(0, 4)
 
 		--- @cast s userdata
-		s:set(1, y + 1)
+		s:set(0, x + sway * math.cos(t() * sway / 2), y + speed)
+
+		-- delete snowflakes that fall offscreen
+		if y + speed > 128 then
+			del(snowflakes, s)
+		end
 	end
 end
 
