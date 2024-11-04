@@ -23,7 +23,7 @@ function _update()
 			flr(rnd(128)), -- x
 			0,             -- y
 			rnd(1.5) + .5, -- speed
-			rnd()          -- sway speed
+			rnd(.5) + 1    -- sway speed
 		))
 	end
 
@@ -31,7 +31,7 @@ function _update()
 		local x, y, speed, sway = s:get(0, 4)
 
 		--- @cast s userdata
-		s:set(0, x + sway * math.cos(t() * sway / 2), y + speed)
+		s:set(0, x + math.cos(t() * sway / 5) / 2, y + speed)
 
 		-- delete snowflakes that fall offscreen
 		if y + speed > 128 then
