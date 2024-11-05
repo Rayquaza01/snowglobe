@@ -14,10 +14,41 @@ function _init()
 
 	--- @type userdata[]
 	snowflakes = {}
+
+	min_spawn_rate = 0
+	spawn_rate_delta = 0.01
+	spawn_rate = 0
+
+	prev_x = nil
+	prev_y = nil
+	on_event("move", function(msg)
+		if not prev_x then
+			prev_x = msg.x
+			prev_y = msg.y
+		end
+
+		local delta = math.abs(msg.x - prev_x) + math.abs(msg.y - prev_y)
+		spawn_rate += delta * spawn_rate_delta * 0.01
+		if spawn_rate > 5 then
+			spawn_rate = 1
+		end
+
+		prev_x = msg.x
+		prev_y = msg.y
+	end)
 end
 
 function _update()
-	if rnd() <= 0.15 then
+	local mx, my, mb, mwx, mwy = mouse()
+	spawn_rate += mwy * spawn_rate_delta
+
+	if spawn_rate > min_spawn_rate then
+		spawn_rate -= spawn_rate_delta * 1/30
+	end
+
+	-- info("Spawn rate: " ..spawn_rate)
+
+	if rnd() <= spawn_rate then
 		-- x, y, speed, sway speed
 		add(snowflakes, vec(
 			flr(rnd(128)), -- x
