@@ -19,6 +19,10 @@ function _init()
 	spawn_rate_delta = 0.01
 	spawn_rate = 0
 
+	--- @type userdata[]
+	smoke = {}
+	smoke_spawn_rate = 0.15
+
 	prev_x = nil
 	prev_y = nil
 	on_event("move", function(msg)
@@ -58,6 +62,15 @@ function _update()
 		))
 	end
 
+	if rnd() < smoke_spawn_rate then
+		add(smoke, vec(
+			flr(rnd(3)) + 98, -- x
+			39,               -- y
+			rnd(.5) + .5,    -- speed
+			rnd(.5) + 1       -- sway speed
+		))
+	end
+
 	for s in all(snowflakes) do
 		local x, y, speed, sway = s:get(0, 4)
 
@@ -69,15 +82,34 @@ function _update()
 			del(snowflakes, s)
 		end
 	end
+
+	for s in all(smoke) do
+		local x, y, speed, sway = s:get(0, 4)
+
+		--@cast s userdata
+		s:set(0, x + math.cos(t() * sway) / 5, y - speed)
+
+		if y < 0 then
+			del(smoke, s)
+		end
+	end
 end
 
 function _draw()
 	cls()
+	spr(1)
 
 	for s in all(snowflakes) do
 		--- @cast s userdata
 		local x, y = s:get(0, 2)
 
 		pset(x, y, 7)
+	end
+
+	for s in all(smoke) do
+		--- @cast s userdata
+		local x, y = s:get(0, 2)
+
+		pset(x, y, rnd({7, 6, 5, 22, 21}))
 	end
 end
